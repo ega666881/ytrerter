@@ -1,0 +1,36 @@
+{
+  "name": "hit-proxy-minimal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "migrate": "npx drizzle-kit generate",
+    "db:push": "npx drizzle-kit push",
+    "build": "tsc",
+    "dev": "nodemon src/index.ts"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.14",
+    "drizzle-kit": "^0.31.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  },
+  "private": true,
+  "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.15.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.43.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "grammy": "^1.36.1",
+    "pg": "^8.15.6",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0",
+    "winston": "^3.17.0",
+    "zod": "^3.24.3"
+  }
+}
