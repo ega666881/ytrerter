@@ -4,8 +4,8 @@ import * as dotenv from 'dotenv-ts'
 dotenv.config();
 
 export default {
-  schema: './config/schema.ts',
-  out: './drizzle',
+  schema: './src/config/schemas',
+  out: './src/drizzle',
   dialect: 'postgresql',
   dbCredentials: {
     host: process.env.PG_HOST!,

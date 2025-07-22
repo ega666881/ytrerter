@@ -3,6 +3,13 @@ import { Context } from 'elysia';
 import axios from 'axios'
 import * as dotenv from 'dotenv-ts'
 import { success } from 'zod';
+import { CreateUserDtoType } from '../dto/user.dto';
+import { CreatePaynamentDto } from '../dto/paynament.dto';
+import * as paynamentRepository from '../repositories/paynament.repository'
+import * as userRepository from '../repositories/user.repository'
+import * as keyRepository from '../repositories/key.repository'
+import { TransactionCurrency, TransactionState } from '../config/schemas';
+
 
 dotenv.config();
 
@@ -29,23 +36,41 @@ export const getWebhookPaynamentCrypto = (context: Context) => {
     }
 
     const isValid = verifySign(payload, sign, process.env.HELEKET_API_KEY)
+    console.log(isValid)
     
 }
 
 export const createPaynamentCrypto = async (contex: Context) => {
-    const body = {
-        amount: "15",
-        currency: "ETH",
-        network: 'eth',
-        order_id: "1312sdfsdf31312213131111231311",
-        url_callback: "https://uncleanly-sincere-margay.cloudpub.ru/api/users/get-paynament",
-        status: 'paid',
+    const body = contex.body as CreatePaynamentDto
+    const user = await userRepository.createOrGetUserByEmail(body.email)
+
+    const transaction = await paynamentRepository.createTransaction({
+        userId: user.id,
+        state: TransactionState.PENDING,
+        currency: TransactionCurrency.USD,
+        url: '',
+    })
+
+    const {amount, email, ...insertDataKey} = body
+    //@ts-ignore
+    await keyRepository.createKey({
+        ...insertDataKey,
+        transactionId: transaction.id,
+        userId: user.id,
+    })
+
+    const paynamentBody = {
+        amount: body.amount.toString(),
+        currency: "USD",
+        order_id: transaction.id.toString(),
+        url_callback: process.env.URL_HELEKET_CALLBACK,
     }
 
-    const sign = generateSign(body, process.env.HELEKET_API_KEY)
+
+    const sign = generateSign(paynamentBody, process.env.HELEKET_API_KEY)
 
     try {
-        const response = await axios.post(`https://api.heleket.com/v1/test-webhook/payment`, body,
+        const response = await axios.post(`https://api.heleket.com/v1/payment`, paynamentBody,
             {
                 headers: {
                     merchant: process.env.HELEKET_MERCHAND_ID,
@@ -54,10 +79,12 @@ export const createPaynamentCrypto = async (contex: Context) => {
                 }
             }
         )
-        return response.data
+        const url = response.data.result.url
+        await paynamentRepository.updateTransaction(transaction.id, {url: url})
+        return url
     } catch (error) {
         //@ts-ignore
-        console.log(error)
+        console.log(error.response.data)
         return error
     }
 }
