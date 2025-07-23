@@ -3,9 +3,9 @@ import { createPaynamentCrypto, getWebhookPaynamentCrypto } from '../controllers
 import { CreatePaynamentSchema } from '../dto/paynament.dto';
 
 const paynamentRoutes = new Elysia()
-  .post('/api/users/get-paynament', getWebhookPaynamentCrypto)
+  .post('/api/paynament/get-paynament', getWebhookPaynamentCrypto)
   .post(
-      '/api/users/create-paynament', 
+      '/api/paynament/create-paynament', 
       createPaynamentCrypto, 
       {
         body: CreatePaynamentSchema as any

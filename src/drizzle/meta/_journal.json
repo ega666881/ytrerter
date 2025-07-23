@@ -8,6 +8,13 @@
       "when": 1753201663397,
       "tag": "0000_plain_machine_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753254089349,
+      "tag": "0001_nebulous_senator_kelly",
+      "breakpoints": true
     }
   ]
 }
