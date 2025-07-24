@@ -39,13 +39,16 @@ export const getWebhookPaynamentCrypto = async (context: Context) => {
     const isValid = verifySign(payload, sign, process.env.HELEKET_API_KEY)
     
     if (isValid) {
-        
+        const trx = await paynamentRepository.getTransaction(payload.order_id)
         if (payload.status === 'paid') {
-            const trx = await paynamentRepository.getTransaction(payload.order_id)
+            
             if (trx) {
                 const {keys, users} = await keyRepository.getKey(undefined, trx.id)
                 if (keys && users) {
                     await keyRepository.updateKeyStatus(keys.id, true)
+                    await paynamentRepository.updateTransaction(trx.id, {
+                        status: TransactionState.SUCCESS
+                    })
                     await sendEmail(users.email, "2222")
 
                 } else {
@@ -57,6 +60,10 @@ export const getWebhookPaynamentCrypto = async (context: Context) => {
                 context.set.status = 404
                 return {status: "trx not found"}
             }
+        } else {
+            await paynamentRepository.updateTransaction(trx.id, {
+                status: TransactionState.FAILED
+            })
         }
 
     } else {
