@@ -49,15 +49,18 @@ export const getWebhookPaynamentCrypto = async (context: Context) => {
                     await sendEmail(users.email, "2222")
 
                 } else {
-                    return {status: "key or user not found"}
+                    context.set.status = 404
+                    return {error: "key or user not found"}
                 }
                 
             } else {
+                context.set.status = 404
                 return {status: "trx not found"}
             }
         }
 
     } else {
+        context.set.status = 403
         return {status: 'no verifid sign'}
     }
     
@@ -108,6 +111,7 @@ export const createPaynamentCrypto = async (contex: Context) => {
     } catch (error) {
         //@ts-ignore
         console.log(error)
+        contex.set.status = 400
         return error
     }
 }
