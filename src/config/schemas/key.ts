@@ -1,4 +1,4 @@
-import {integer, pgEnum, pgTable, text, timestamp, uuid, varchar} from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, text, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
 import {InferSelectModel, relations} from "drizzle-orm";
 import {users} from "./user";
 
@@ -13,6 +13,7 @@ export const keys = pgTable('keys', {
   usageType: varchar().notNull(),
   function: varchar().notNull(),
   protocol: varchar().notNull(),
+  paymentSuccess: boolean().default(false),
   tariff: varchar().notNull(),
   tcpConnectionsLimit: integer().notNull(),
   whitelistedIpLimit: integer().notNull(),

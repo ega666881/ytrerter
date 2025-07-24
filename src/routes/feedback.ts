@@ -4,8 +4,8 @@ import { CreateFeedbackSchema } from '../dto/feedback.dto';
 import { createFeedback, getFeedbacks } from '../controllers/feedback.controller';
 
 
-const paynamentRoutes = new Elysia()
-  .post('/api/feedbacks/get-feedbacks', getFeedbacks)
+const feedbackRoutes = new Elysia()
+  .get('/api/feedbacks/get-feedbacks', getFeedbacks)
   .post(
       '/api/feedbacks/create-feedback', 
       createFeedback, 
@@ -14,4 +14,4 @@ const paynamentRoutes = new Elysia()
       }
     )
 
-export default paynamentRoutes;
+export default feedbackRoutes;

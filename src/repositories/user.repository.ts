@@ -17,3 +17,8 @@ export const createOrGetUserByEmail = async (email: string) => {
         return insertRow
     }
 }
+
+export const getUserById = async (id: string) => {
+    const [findedRow] = await db.select().from(users).where(eq(users.id, id))
+    return findedRow
+}

@@ -2,9 +2,9 @@ import { pgTable, serial, varchar, timestamp, doublePrecision, uuid, text } from
 
 
 export const feedback = pgTable('feedbacks', {
-  id: uuid().primaryKey().defaultRandom(),
+  id: uuid('id').primaryKey().defaultRandom(),
   email: varchar('email', { length: 255 }).notNull().unique(),
-  name: varchar(),
-  text: text(),
+  name: varchar('name'),
+  text: text('text'),
   createdAt: timestamp('createdAt').defaultNow(),
 });

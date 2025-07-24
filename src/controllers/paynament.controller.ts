@@ -9,6 +9,8 @@ import * as paynamentRepository from '../repositories/paynament.repository'
 import * as userRepository from '../repositories/user.repository'
 import * as keyRepository from '../repositories/key.repository'
 import { TransactionCurrency, TransactionState } from '../config/schemas';
+import { IPaymentWebhookBody } from '../types/transaction.types';
+import { sendEmail } from '../utils/sendEmail';
 
 
 dotenv.config();
@@ -28,15 +30,36 @@ const verifySign = (data: any, receivedSign: string, apiKey: string | undefined)
   return generatedSign === receivedSign;
 };
 
-export const getWebhookPaynamentCrypto = (context: Context) => {
-    const { sign, ...payload } = context.body as any
-
+export const getWebhookPaynamentCrypto = async (context: Context) => {
+    const { sign, ...payload } = context.body as IPaymentWebhookBody
     if (!sign) {
         return { success: false, error: "No sign provided" }
     }
 
     const isValid = verifySign(payload, sign, process.env.HELEKET_API_KEY)
-    console.log(isValid)
+    
+    if (isValid) {
+        
+        if (payload.status === 'paid') {
+            const trx = await paynamentRepository.getTransaction(payload.order_id)
+            if (trx) {
+                const {keys, users} = await keyRepository.getKey(undefined, trx.id)
+                if (keys && users) {
+                    await keyRepository.updateKeyStatus(keys.id, true)
+                    await sendEmail(users.email, "2222")
+
+                } else {
+                    return {status: "key or user not found"}
+                }
+                
+            } else {
+                return {status: "trx not found"}
+            }
+        }
+
+    } else {
+        return {status: 'no verifid sign'}
+    }
     
 }
 
@@ -84,7 +107,7 @@ export const createPaynamentCrypto = async (contex: Context) => {
         return url
     } catch (error) {
         //@ts-ignore
-        console.log(error.response.data)
+        console.log(error)
         return error
     }
 }
